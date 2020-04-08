@@ -1,0 +1,51 @@
+{
+  "Sensor_Temp1": 
+    "Data": {
+      "temp_1": 25.5,
+      "temp_2": 24.4,
+      "temp_3": "N/A",
+      "temp_4": "N/A"
+    },    
+    "Alert": {
+      "Temp_1_min": 0,
+      "Temp_2_min": 0
+    },
+     "properties": {
+      "Trigger": {
+        "Temp_1_min": 25.5,
+        "Temp_1_status": 1,
+        "Temp_2_min": 25.5,
+        "Temp_2_status": 1
+      },
+      "status": "online",
+      "type": "temp",
+      "uid": "UID",
+      "version": "1.0.0"
+    }
+  },
+
+  "Sensor_Temp2": {
+    "Data": {
+      "temp_1": 25.5,
+      "temp_2": 24.4,
+      "temp_3": "N/A",
+      "temp_4": "N/A"
+    },    
+    "Alert": {
+      "Temp_1_min": 0,
+      "Temp_2_min": 0
+    },
+    "properties": {
+      "Trigger": {
+	"Temp_1_min": 25.5,
+	"Temp_1_status": 1,
+	"Temp_2_min": 25.5,
+	"Temp_2_status": 1
+      },
+      "status": "online",
+      "type": "temp",
+      "uid": "UID",
+      "version": "1.0.0"
+    }
+  }
+}
