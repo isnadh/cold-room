@@ -22,6 +22,7 @@ void send_byte(uint8_t b);
 void usart_puts(char* s);
 void send_byte2(uint8_t b);
 void usart_puts2(char *s);
+uint16_t crc16_update(uint16_t crc, uint8_t a);
 
 void delay(unsigned long ms);
 
@@ -371,7 +372,27 @@ uint8_t Scan_Sensors(void)
 
 }
 
+// Ex. code To use this crc16
+/*
+    uint16_t crc = 0xFFFF;
+    int i;
+    for(i = 0; i < 5; i++){
+        crc = crc16_update(crc, data_buf[i]);
+      }
+*/
+uint16_t crc16_update(uint16_t crc, uint8_t a) {
+  int i;
 
+  crc ^= (uint16_t)a;
+  for (i = 0; i < 8; ++i) {
+    if (crc & 1)
+      crc = (crc >> 1) ^ 0xA001;
+    else
+      crc = (crc >> 1);
+  }
+
+  return crc;
+}
 
 int main(void)
 {
@@ -401,7 +422,7 @@ int main(void)
   usart_puts("\r\nSTART\r\n");
   
   Number_of_sensor = Scan_Sensors();
-  sprintf(Debug_BUF, "%d Sensors connected", Number_of_sensor );
+  sprintf(Debug_BUF, "--- %d Sensors connected ---", Number_of_sensor );
   usart_puts(Debug_BUF);
 
   /* Reset ESP*/
