@@ -30,7 +30,7 @@ int writeFunc(uint8_t *buffer, size_t size);
 bool readableFunc(void);
 void sleepFunc(int us);
 
-void Scan_Sensors(void);
+uint8_t Scan_Sensors(void);
 
 int count = 0;
 int reset_cnt = 0;
@@ -42,6 +42,8 @@ uint8_t Command_BUF[10] = {'\0'};
 bool data_ready = false;
 uint8_t command_digit = 0;
 uint8_t State = 1;
+
+uint8_t Number_of_sensor = 0;
 
 simple_float temp_data ;
 one_wire_device data;
@@ -321,41 +323,51 @@ void sleepFunc(int us)
 }
 
 
-void Scan_Sensors(void)
+uint8_t Scan_Sensors(void)
 {
+  uint8_t retry = 0;
+  uint8_t sum = 0;
 
   ds18b20_init(GPIOA, GPIO_Pin_1, TIM2);
-  usart_puts("Scan Sensor 01 ");
-  if(one_wire_reset_pulse()){
-     usart_puts("-> Sensor01 connected\n"); 
+  for(retry = 0 ; retry <= 5 ; retry++){
 
-     data = one_wire_read_rom();
-     sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
-     usart_puts(Debug_BUF);
-     usart_puts("\n");
+      usart_puts("Scan Sensor 01 ");      
+      if(one_wire_reset_pulse()){
+         usart_puts("-> Sensor01 connected!!!\n"); 
 
+         data = one_wire_read_rom();
+         sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
+         usart_puts(Debug_BUF);
+         usart_puts("\n");
+         sum++;
+         break;
+      }
+      else{
+         usart_puts("-> Sensor01 not connected...\n");    
+      }
   }
-  else{
-     usart_puts("-> Sensor01 not connected\n");    
-  }
-
 
 
   ds18b20_init(GPIOA, GPIO_Pin_2, TIM2);
-  usart_puts("Scan Sensor 02 ");
-  if(one_wire_reset_pulse()){
-     usart_puts("-> Sensor02 connected\n"); 
+  for(retry = 0 ; retry <= 5 ; retry++){
 
-     data = one_wire_read_rom();
-     sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
-     usart_puts(Debug_BUF);
-     usart_puts("\n");
+      usart_puts("Scan Sensor 02 ");
+      if(one_wire_reset_pulse()){
+         usart_puts("-> Sensor02 connected!!!\n"); 
 
+         data = one_wire_read_rom();
+         sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
+         usart_puts(Debug_BUF);
+         usart_puts("\n");
+         sum++;
+         break;
+      }
+      else{
+         usart_puts("-> Sensor02 not connected...\n");    
+      }
   }
-  else{
-     usart_puts("-> Sensor02 not connected\n");    
-  }
 
+  return sum;
 
 }
 
@@ -387,11 +399,10 @@ int main(void)
 
 
   usart_puts("\r\nSTART\r\n");
-
   
-
-  Scan_Sensors();
-
+  Number_of_sensor = Scan_Sensors();
+  sprintf(Debug_BUF, "%d Sensors connected", Number_of_sensor );
+  usart_puts(Debug_BUF);
 
   /* Reset ESP*/
   usart_puts("\r\nReset ESP\r\n");
@@ -408,12 +419,12 @@ int main(void)
   { 
 
    // IWDG_ReloadCounter(); 
-   sprintf(Debug_BUF, "count is : %d", count);
-   usart_puts(Debug_BUF);
-   usart_puts("\n");
-   sprintf(Debug_BUF, "reset cnt is : %d", reset_cnt);
-   usart_puts(Debug_BUF);
-   usart_puts("\n");
+   // sprintf(Debug_BUF, "count is : %d", count);
+   // usart_puts(Debug_BUF);
+   // usart_puts("\n");
+   // sprintf(Debug_BUF, "reset cnt is : %d", reset_cnt);
+   // usart_puts(Debug_BUF);
+   // usart_puts("\n");
 
 
    if (data_ready) {
