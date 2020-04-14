@@ -22,6 +22,8 @@ void send_byte(uint8_t b);
 void usart_puts(char* s);
 void send_byte2(uint8_t b);
 void usart_puts2(char *s);
+
+void Send_ESP_Payload(void);
 uint16_t crc16_update(uint16_t crc, uint8_t a);
 
 void delay(unsigned long ms);
@@ -32,19 +34,24 @@ bool readableFunc(void);
 void sleepFunc(int us);
 
 uint8_t Scan_Sensors(void);
+void Read_Sensors(void);
 
 int count = 0;
 int reset_cnt = 0;
 
 char Debug_BUF[100];
 uint8_t Command_BUF[10] = {'\0'};
-
+char ESP_Payload[100];
 
 bool data_ready = false;
 uint8_t command_digit = 0;
 uint8_t State = 1;
 
 uint8_t Number_of_sensor = 0;
+char temp_1[10];
+char temp_2[10];
+char temp_3[10];
+char temp_4[10];
 
 simple_float temp_data ;
 one_wire_device data;
@@ -53,6 +60,14 @@ circular_buf_t cbuf;
 atparser_t parser;
 
 
+/*USART Data
+"Data": {
+      "temp_1": 25.5,
+      "temp_2": 24.4,
+      "temp_3": "N/A",
+      "temp_4": "N/A"
+    }
+*/
 
 void USART2_IRQHandler(void)
 {
@@ -329,7 +344,9 @@ uint8_t Scan_Sensors(void)
   uint8_t retry = 0;
   uint8_t sum = 0;
 
-  ds18b20_init(GPIOA, GPIO_Pin_1, TIM2);
+  //Temp 1
+  usart_puts("\n"); 
+  ds18b20_init(GPIOA, GPIO_Pin_0, TIM2);
   for(retry = 0 ; retry <= 5 ; retry++){
 
       usart_puts("Scan Sensor 01 ");      
@@ -340,16 +357,18 @@ uint8_t Scan_Sensors(void)
          sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
          usart_puts(Debug_BUF);
          usart_puts("\n");
-         sum++;
+         sum++; 
          break;
       }
       else{
-         usart_puts("-> Sensor01 not connected...\n");    
+         usart_puts("-> Sensor01 not connected...\n");
+         strcpy(temp_1,"N/A");    
       }
   }
 
-
-  ds18b20_init(GPIOA, GPIO_Pin_2, TIM2);
+  //Temp 2
+  usart_puts("\n"); 
+  ds18b20_init(GPIOA, GPIO_Pin_1, TIM2);
   for(retry = 0 ; retry <= 5 ; retry++){
 
       usart_puts("Scan Sensor 02 ");
@@ -360,20 +379,118 @@ uint8_t Scan_Sensors(void)
          sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
          usart_puts(Debug_BUF);
          usart_puts("\n");
-         sum++;
+         sum++;    
          break;
       }
       else{
-         usart_puts("-> Sensor02 not connected...\n");    
+         usart_puts("-> Sensor02 not connected...\n");
+         strcpy(temp_2,"N/A");     
       }
   }
 
+  //Temp 3
+  usart_puts("\n"); 
+  ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
+  for(retry = 0 ; retry <= 5 ; retry++){
+
+      usart_puts("Scan Sensor 03 ");      
+      if(one_wire_reset_pulse()){
+         usart_puts("-> Sensor03 connected!!!\n"); 
+
+         data = one_wire_read_rom();
+         sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
+         usart_puts(Debug_BUF);
+         usart_puts("\n");
+         sum++; 
+         break;
+      }
+      else{
+         usart_puts("-> Sensor03 not connected...\n");
+         strcpy(temp_3,"N/A");    
+      }
+  }
+
+  //Temp 4
+  usart_puts("\n"); 
+  ds18b20_init(GPIOA, GPIO_Pin_6, TIM2);
+  for(retry = 0 ; retry <= 5 ; retry++){
+
+      usart_puts("Scan Sensor 04 ");
+      if(one_wire_reset_pulse()){
+         usart_puts("-> Sensor04 connected!!!\n"); 
+
+         data = one_wire_read_rom();
+         sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
+         usart_puts(Debug_BUF);
+         usart_puts("\n");
+         sum++;    
+         break;
+      }
+      else{
+         usart_puts("-> Sensor04 not connected...\n");
+         strcpy(temp_4,"N/A");     
+      }
+  }
   return sum;
 
 }
 
-// Ex. code To use this crc16
-/*
+void Read_Sensors(void){
+ float temp; 
+
+  if (strcmp(temp_1, "N/A")){
+      ds18b20_init(GPIOA, GPIO_Pin_0, TIM2);
+      ds18b20_convert_temperature_simple();
+      Delay_1us(1000000);
+      temp_data = ds18b20_read_temperature_simple();
+        
+        if(temp_data.is_valid){
+          temp = temp_data.raw_temp;   
+        }
+        else{
+          strcpy(temp_1,"N/A"); 
+        }
+      gcvt(temp,5,temp_1);  
+      Delay_1us(10000);
+  }
+
+  if (strcmp(temp_2, "N/A")){
+      ds18b20_init(GPIOA, GPIO_Pin_1, TIM2);
+      ds18b20_convert_temperature_simple();
+      Delay_1us(1000000);
+      temp_data = ds18b20_read_temperature_simple();
+        
+        if(temp_data.is_valid){
+          temp = temp_data.raw_temp;
+
+        }
+        else{
+          strcpy(temp_2,"N/A"); 
+        }
+      gcvt(temp,5,temp_2); 
+      Delay_1us(10000);
+  }
+
+}
+
+void Send_ESP_Payload(void)
+{
+  char Payload [ ] = "\"Data\": {\"temp_1\": 25.5,\"temp_2\": 24.4,\"temp_3\": \"N/A\",\"temp_4\": \"N/A\"}";
+
+  sprintf(Debug_BUF, "\nESP_Payload :  %s \n", Payload );
+  usart_puts(Debug_BUF);
+  
+  uint16_t crc = 0xFFFF;
+  uint8_t i;
+    for(i = 0; i < sizeof(Payload)-1; i++){
+        crc = crc16_update(crc, (uint8_t)Payload[i]);
+      }
+
+  sprintf(Debug_BUF, "\nESP_Payload CRC :  %X \n",crc );
+  usart_puts(Debug_BUF);
+}
+
+/* Ex. code To use this crc16
     uint16_t crc = 0xFFFF;
     int i;
     for(i = 0; i < 5; i++){
@@ -422,7 +539,10 @@ int main(void)
   usart_puts("\r\nSTART\r\n");
   
   Number_of_sensor = Scan_Sensors();
-  sprintf(Debug_BUF, "--- %d Sensors connected ---", Number_of_sensor );
+  sprintf(Debug_BUF, "\n--- %d Sensors connected ---\n", Number_of_sensor );
+  usart_puts(Debug_BUF);
+  Read_Sensors();
+  sprintf(Debug_BUF, "\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}", temp_1,temp_2,temp_3,temp_4 );
   usart_puts(Debug_BUF);
 
   /* Reset ESP*/
@@ -435,6 +555,7 @@ int main(void)
   // IWDG_ReloadCounter();
   // delay(5000);
 
+  Send_ESP_Payload();
 
   while (1)
   { 
