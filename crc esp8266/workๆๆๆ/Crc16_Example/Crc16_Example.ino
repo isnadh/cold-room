@@ -13,7 +13,7 @@ void setup()
 void loop(){
   
   byte data[] = "ABCDEfghI";
-
+  
   for(int i=0;i<9;i++){
      Serial.print("byte ");
      Serial.print(i);
