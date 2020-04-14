@@ -1,6 +1,7 @@
 #include <Crc16.h>
 
 Crc16 crc; 
+uint16_t *parameter;
 uint16_t value;
 char buffer1[100];
 
