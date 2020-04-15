@@ -28,7 +28,6 @@ bool update_data(){
 void loop() {
   crc.clearCrc();
   uint8_t data[] = "\"Data\": {\"temp_1\": 25.5,\"temp_2\": 24.4,\"temp_3\": \"N/A\",\"temp_4\": \"N/A\"}";
-  //char data1[] = "\"Data\": {\"temp_1\": 25.5,\"temp_2\": 24.4,\"temp_3\": \"N/A\",\"temp_4\": \"N/A\"}";
 
   delay(1000);
   ///cheack array size //////
