@@ -36,18 +36,31 @@ void sleepFunc(int us);
 uint8_t Scan_Sensors(void);
 void Read_Sensors(void);
 
+//ESP Reset counter
 int count = 0;
 int reset_cnt = 0;
 
+// Buffer
 char Debug_BUF[100];
 uint8_t Command_BUF[10] = {'\0'};
 char ESP_Payload[100];
 
+
+// For Usart command 
 bool data_ready = false;
 uint8_t command_digit = 0;
 uint8_t State = 1;
 
+
+// Status of connecting sensors 
 uint8_t Number_of_sensor = 0;
+bool temp1_connected = false;
+bool temp2_connected = false;
+bool temp3_connected = false;
+bool temp4_connected = false;
+
+
+// Char buffer for storing sensors data
 char temp_1[10];
 char temp_2[10];
 char temp_3[10];
@@ -339,6 +352,7 @@ void sleepFunc(int us)
 }
 
 
+// Call when start-up (1-Time)
 uint8_t Scan_Sensors(void)
 {
   uint8_t retry = 0;
@@ -357,7 +371,8 @@ uint8_t Scan_Sensors(void)
          sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
          usart_puts(Debug_BUF);
          usart_puts("\n");
-         sum++; 
+         temp1_connected = true;
+         sum++;     
          break;
       }
       else{
@@ -379,6 +394,7 @@ uint8_t Scan_Sensors(void)
          sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
          usart_puts(Debug_BUF);
          usart_puts("\n");
+         temp2_connected = true;
          sum++;    
          break;
       }
@@ -401,6 +417,7 @@ uint8_t Scan_Sensors(void)
          sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
          usart_puts(Debug_BUF);
          usart_puts("\n");
+         temp3_connected = true;
          sum++; 
          break;
       }
@@ -423,6 +440,7 @@ uint8_t Scan_Sensors(void)
          sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
          usart_puts(Debug_BUF);
          usart_puts("\n");
+         temp4_connected = true;
          sum++;    
          break;
       }
@@ -438,7 +456,8 @@ uint8_t Scan_Sensors(void)
 void Read_Sensors(void){
  float temp; 
 
-  if (strcmp(temp_1, "N/A")){
+  //Read Sensor1
+  if (temp1_connected){
       ds18b20_init(GPIOA, GPIO_Pin_0, TIM2);
       ds18b20_convert_temperature_simple();
       Delay_1us(1000000);
@@ -446,15 +465,18 @@ void Read_Sensors(void){
         
         if(temp_data.is_valid){
           temp = temp_data.raw_temp;   
+          //Convert float to String//
+          gcvt(temp,5,temp_1);  
         }
         else{
           strcpy(temp_1,"N/A"); 
         }
-      gcvt(temp,5,temp_1);  
+
       Delay_1us(10000);
   }
 
-  if (strcmp(temp_2, "N/A")){
+  //Read Sensor2
+  if (temp2_connected){
       ds18b20_init(GPIOA, GPIO_Pin_1, TIM2);
       ds18b20_convert_temperature_simple();
       Delay_1us(1000000);
@@ -462,12 +484,51 @@ void Read_Sensors(void){
         
         if(temp_data.is_valid){
           temp = temp_data.raw_temp;
-
+          //Convert float to String//
+          gcvt(temp,5,temp_2); 
         }
         else{
           strcpy(temp_2,"N/A"); 
         }
-      gcvt(temp,5,temp_2); 
+
+      Delay_1us(10000);
+  }
+
+   //Read Sensor3
+   if (temp3_connected){
+      ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
+      ds18b20_convert_temperature_simple();
+      Delay_1us(1000000);
+      temp_data = ds18b20_read_temperature_simple();
+        
+        if(temp_data.is_valid){
+          temp = temp_data.raw_temp;
+          //Convert float to String//
+          gcvt(temp,5,temp_3); 
+        }
+        else{
+          strcpy(temp_3,"N/A"); 
+        }
+
+      Delay_1us(10000);
+  }
+
+   //Read Sensor4
+   if (temp4_connected){
+      ds18b20_init(GPIOA, GPIO_Pin_6, TIM2);
+      ds18b20_convert_temperature_simple();
+      Delay_1us(1000000);
+      temp_data = ds18b20_read_temperature_simple();
+        
+        if(temp_data.is_valid){
+          temp = temp_data.raw_temp;
+          //Convert float to String//
+          gcvt(temp,5,temp_4);
+        }
+        else{
+          strcpy(temp_4,"N/A"); 
+        }
+ 
       Delay_1us(10000);
   }
 
@@ -475,10 +536,10 @@ void Read_Sensors(void){
 
 void Send_ESP_Payload(void)
 {
-  char Payload [ ] = "\"Data\": {\"temp_1\": 25.5,\"temp_2\": 24.4,\"temp_3\": \"N/A\",\"temp_4\": \"N/A\"}";
-
-  sprintf(Debug_BUF, "\nESP_Payload :  %s \n", Payload );
-  usart_puts(Debug_BUF);
+  //Payload => "\"Data\": {\"temp_1\": 25.5,\"temp_2\": 24.4,\"temp_3\": \"N/A\",\"temp_4\": \"N/A\"}"//
+  char Payload [200];
+  sprintf(Payload, "\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}", temp_1,temp_2,temp_3,temp_4 );
+  usart_puts(Payload);
   
   uint16_t crc = 0xFFFF;
   uint8_t i;
@@ -488,9 +549,23 @@ void Send_ESP_Payload(void)
 
   sprintf(Debug_BUF, "\nESP_Payload CRC :  %X \n",crc );
   usart_puts(Debug_BUF);
+
+  // convert CRC16 to 2byte 
+  uint8_t  crc8[2];
+  crc8[0]= (uint8_t)crc;
+  crc8[1]=(crc >> 8);
+
+  sprintf(Debug_BUF, "\nESP_Payload CRC :  %X , %X\n",crc8[0],crc8[1] );
+  usart_puts(Debug_BUF);
+
+  //Send data to ESP
+  usart_puts2(Payload);
+  send_byte2(crc8[1]);
+  send_byte2(crc8[0]);
+
 }
 
-/* Ex. code To use this crc16
+/*Ex. code To use this crc16
     uint16_t crc = 0xFFFF;
     int i;
     for(i = 0; i < 5; i++){
@@ -515,7 +590,7 @@ int main(void)
 {
   /* Initialize Leds mounted on STM32 board */
   GPIO_InitTypeDef  GPIO_InitStructure;
-  /* Initialize Reset which connected to PA8, Enable the Clock*/
+  /* Initialize ESP-Reset which is connected to PA8, Enable the Clock*/
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
   /* Configure the GPIO_LED pin */
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
@@ -523,7 +598,7 @@ int main(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-  /* Disable reset */
+  /* Disable ESP-reset */
   GPIO_SetBits(GPIOA, GPIO_Pin_8);
 
   // init_iwdg();
@@ -555,7 +630,6 @@ int main(void)
   // IWDG_ReloadCounter();
   // delay(5000);
 
-  Send_ESP_Payload();
 
   while (1)
   { 
@@ -578,6 +652,10 @@ int main(void)
 
         memset(Command_BUF, 0, sizeof Command_BUF);
         atparser_flush(&parser);
+        ///////////////////////////////////////////////////////
+        Read_Sensors();
+        Send_ESP_Payload();
+        //////////////////////////////////////////////////////
         data_ready = false;
         count = 0;
       }
