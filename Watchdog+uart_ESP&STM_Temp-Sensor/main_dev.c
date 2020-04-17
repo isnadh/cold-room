@@ -536,18 +536,21 @@ void Read_Sensors(void){
 
 void Send_ESP_Payload(void)
 {
-  //Payload => "\"Data\": {\"temp_1\": 25.5,\"temp_2\": 24.4,\"temp_3\": \"N/A\",\"temp_4\": \"N/A\"}"//
-  char Payload [200];
+  char Payload [100];
+
   sprintf(Payload, "\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}", temp_1,temp_2,temp_3,temp_4 );
   usart_puts(Payload);
-  
+  sprintf(Debug_BUF, "\nPayload size :  %d \n", strlen(Payload) );
+  usart_puts(Debug_BUF);
+
+
   uint16_t crc = 0xFFFF;
   uint8_t i;
-    for(i = 0; i < sizeof(Payload)-1; i++){
+    for(i = 0; i < strlen(Payload); i++){
         crc = crc16_update(crc, (uint8_t)Payload[i]);
       }
 
-  sprintf(Debug_BUF, "\nESP_Payload CRC :  %X \n",crc );
+  sprintf(Debug_BUF, "\nPayload CRC :  %X \n",crc );
   usart_puts(Debug_BUF);
 
   // convert CRC16 to 2byte 
@@ -555,7 +558,7 @@ void Send_ESP_Payload(void)
   crc8[0]= (uint8_t)crc;
   crc8[1]=(crc >> 8);
 
-  sprintf(Debug_BUF, "\nESP_Payload CRC :  %X , %X\n",crc8[0],crc8[1] );
+  sprintf(Debug_BUF, "\nESP_Payload CRC :  %X , %X\n",crc8[1],crc8[0] );
   usart_puts(Debug_BUF);
 
   //Send data to ESP
