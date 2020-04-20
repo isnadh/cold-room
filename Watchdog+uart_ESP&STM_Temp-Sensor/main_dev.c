@@ -377,7 +377,7 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor01 not connected...\n");
-         strcpy(temp_1,"N/A");    
+         strcpy(temp_1,"\"N/A\"");    
       }
   }
 
@@ -400,13 +400,13 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor02 not connected...\n");
-         strcpy(temp_2,"N/A");     
+         strcpy(temp_2,"\"N/A\"");     
       }
   }
 
   //Temp 3
   usart_puts("\n"); 
-  ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
+  ds18b20_init(GPIOA, GPIO_Pin_4, TIM2);
   for(retry = 0 ; retry <= 5 ; retry++){
 
       usart_puts("Scan Sensor 03 ");      
@@ -423,13 +423,13 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor03 not connected...\n");
-         strcpy(temp_3,"N/A");    
+         strcpy(temp_3,"\"N/A\"");    
       }
   }
 
   //Temp 4
   usart_puts("\n"); 
-  ds18b20_init(GPIOA, GPIO_Pin_6, TIM2);
+  ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
   for(retry = 0 ; retry <= 5 ; retry++){
 
       usart_puts("Scan Sensor 04 ");
@@ -446,7 +446,7 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor04 not connected...\n");
-         strcpy(temp_4,"N/A");     
+         strcpy(temp_4,"\"N/A\"");     
       }
   }
   return sum;
@@ -460,7 +460,7 @@ void Read_Sensors(void){
   if (temp1_connected){
       ds18b20_init(GPIOA, GPIO_Pin_0, TIM2);
       ds18b20_convert_temperature_simple();
-      Delay_1us(1000000);
+      Delay_1us(200000);
       temp_data = ds18b20_read_temperature_simple();
         
         if(temp_data.is_valid){
@@ -469,7 +469,7 @@ void Read_Sensors(void){
           gcvt(temp,5,temp_1);  
         }
         else{
-          strcpy(temp_1,"N/A"); 
+          strcpy(temp_1,"\"N/A\""); 
         }
 
       Delay_1us(10000);
@@ -479,7 +479,7 @@ void Read_Sensors(void){
   if (temp2_connected){
       ds18b20_init(GPIOA, GPIO_Pin_1, TIM2);
       ds18b20_convert_temperature_simple();
-      Delay_1us(1000000);
+      Delay_1us(200000);
       temp_data = ds18b20_read_temperature_simple();
         
         if(temp_data.is_valid){
@@ -488,7 +488,7 @@ void Read_Sensors(void){
           gcvt(temp,5,temp_2); 
         }
         else{
-          strcpy(temp_2,"N/A"); 
+          strcpy(temp_2,"\"N/A\""); 
         }
 
       Delay_1us(10000);
@@ -496,9 +496,9 @@ void Read_Sensors(void){
 
    //Read Sensor3
    if (temp3_connected){
-      ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
+      ds18b20_init(GPIOA, GPIO_Pin_4, TIM2);
       ds18b20_convert_temperature_simple();
-      Delay_1us(1000000);
+      Delay_1us(200000);
       temp_data = ds18b20_read_temperature_simple();
         
         if(temp_data.is_valid){
@@ -507,7 +507,7 @@ void Read_Sensors(void){
           gcvt(temp,5,temp_3); 
         }
         else{
-          strcpy(temp_3,"N/A"); 
+          strcpy(temp_3,"\"N/A\""); 
         }
 
       Delay_1us(10000);
@@ -515,9 +515,9 @@ void Read_Sensors(void){
 
    //Read Sensor4
    if (temp4_connected){
-      ds18b20_init(GPIOA, GPIO_Pin_6, TIM2);
+      ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
       ds18b20_convert_temperature_simple();
-      Delay_1us(1000000);
+      Delay_1us(200000);
       temp_data = ds18b20_read_temperature_simple();
         
         if(temp_data.is_valid){
@@ -526,7 +526,7 @@ void Read_Sensors(void){
           gcvt(temp,5,temp_4);
         }
         else{
-          strcpy(temp_4,"N/A"); 
+          strcpy(temp_4,"\"N/A\""); 
         }
  
       Delay_1us(10000);
@@ -538,7 +538,7 @@ void Send_ESP_Payload(void)
 {
   char Payload [100];
 
-  sprintf(Payload, "\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}", temp_1,temp_2,temp_3,temp_4 );
+  sprintf(Payload, "{\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}}", temp_1,temp_2,temp_3,temp_4 );
   usart_puts(Payload);
   sprintf(Debug_BUF, "\nPayload size :  %d \n", strlen(Payload) );
   usart_puts(Debug_BUF);
@@ -674,6 +674,7 @@ int main(void)
 
       else{
         usart_puts("Unknown Command\n");
+        atparser_flush(&parser);
         data_ready = false;
       }
 
