@@ -604,7 +604,7 @@ int main(void)
   /* Disable ESP-reset */
   GPIO_SetBits(GPIOA, GPIO_Pin_8);
 
-  // init_iwdg();
+  init_iwdg();
   init_usart1();
   init_usart2();
   NVIC_Configuration();
@@ -625,25 +625,28 @@ int main(void)
 
   /* Reset ESP*/
   usart_puts("\r\nReset ESP\r\n");
-  // GPIO_ResetBits(GPIOA, GPIO_Pin_8);
-  // delay(5000);
-  // GPIO_SetBits(GPIOA, GPIO_Pin_8);
+  GPIO_ResetBits(GPIOA, GPIO_Pin_8);
+  Delay_1us(2000000);
+  GPIO_SetBits(GPIOA, GPIO_Pin_8);
 
    /* Wait ESP ready*/
-  // IWDG_ReloadCounter();
-  // delay(5000);
+  IWDG_ReloadCounter();
+  Delay_1us(6000000);
 
+  memset(Command_BUF, 0, sizeof Command_BUF);
+  atparser_flush(&parser);
+  usart_puts("\r\nStart\r\n");
 
   while (1)
   { 
 
-   // IWDG_ReloadCounter(); 
-   // sprintf(Debug_BUF, "count is : %d", count);
-   // usart_puts(Debug_BUF);
-   // usart_puts("\n");
-   // sprintf(Debug_BUF, "reset cnt is : %d", reset_cnt);
-   // usart_puts(Debug_BUF);
-   // usart_puts("\n");
+   IWDG_ReloadCounter(); 
+   sprintf(Debug_BUF, "count is : %d", count);
+   usart_puts(Debug_BUF);
+   usart_puts("\n");
+   sprintf(Debug_BUF, "reset cnt is : %d", reset_cnt);
+   usart_puts(Debug_BUF);
+   usart_puts("\n");
 
 
    if (data_ready) {
@@ -672,10 +675,21 @@ int main(void)
         count = 0;
       }
 
-      else{
-        usart_puts("Unknown Command\n");
+      else if (!strcmp((char*)Command_BUF, "RegisGW\r\n")) {
+        usart_puts("Regis_GW: OK\n");
+
+        memset(Command_BUF, 0, sizeof Command_BUF);
         atparser_flush(&parser);
         data_ready = false;
+        count = 0;
+      }
+
+      else{
+        usart_puts("Unknown Command\n");        
+        memset(Command_BUF, 0, sizeof Command_BUF);
+        atparser_flush(&parser);
+        data_ready = false;
+        count++;
       }
 
       usart_puts("\n");
@@ -690,19 +704,24 @@ int main(void)
 
    if(count >= 300){
 
-   // IWDG_ReloadCounter();
+   IWDG_ReloadCounter();
 
    usart_puts("\r\nReset ESP\r\n");
-   // GPIO_ResetBits(GPIOA, GPIO_Pin_8);
-   // delay(5000);
-   // GPIO_SetBits(GPIOA, GPIO_Pin_8);
-   
+   GPIO_ResetBits(GPIOA, GPIO_Pin_8);
+   Delay_1us(2000000);
+   GPIO_SetBits(GPIOA, GPIO_Pin_8);
+   Delay_1us(6000000);
+   usart_puts("\r\nStart\r\n");
+
+   memset(Command_BUF, 0, sizeof Command_BUF);
+   atparser_flush(&parser);
+
    reset_cnt++;
    count = 0;
 
    }
 
-   delay(1000);
+   Delay_1us(500000);
 
   }
 }
