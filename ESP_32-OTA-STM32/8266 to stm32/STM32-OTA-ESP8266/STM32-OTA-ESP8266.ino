@@ -69,10 +69,11 @@ uint8_t binread[256];
 int bini = 0;
 String stringtmp;
 int rdtmp;
-
+bool STM_Runmode = true;
 
 void handleFlash()
 {
+  Serial.begin(115200, SERIAL_8E1);
   String FileName, flashwr;
   int lastbuf = 0;
   uint8_t cflag, fnum = 256;
@@ -108,6 +109,7 @@ void handleFlash()
         else flashwr = "Error";
       }
     fsUploadFile.close();
+    Serial.begin(115200);
     server.send(200, "text/plain", "Flash: "+flashwr);
   }
 }
@@ -150,6 +152,7 @@ void handleFileDelete() {
 
 void handleListFiles()
 {
+  Serial.begin(115200, SERIAL_8E1);
   String FileList = "Bootloader Ver: ";
   String Listcode;
   char blversion = 0;
@@ -170,13 +173,14 @@ void handleListFiles()
     }
     FileList +=  FileName + "   Size:" + FileSize;
   }
+  Serial.begin(115200);
   server.send(200, "text/plain", "FileList: "+  FileList );
 }
 
 void setup(void)
 {
   SPIFFS.begin();
-  Serial.begin(115200, SERIAL_8E1);
+  Serial.begin(115200);
   pinMode(BOOT0, OUTPUT);
   pinMode(NRST, OUTPUT);
   pinMode(LED, OUTPUT);
@@ -204,17 +208,22 @@ void setup(void)
     server.on("/program", HTTP_GET, handleFlash);
     
     server.on("/RunMode", HTTP_GET, []() {
+      STM_Runmode = true;
       RunMode();
       server.send(200, "text/plain", "Runstate : OK");
     });
     
     server.on("/EraseFlash", HTTP_GET, []() {
+      Serial.begin(115200, SERIAL_8E1);
+      
       if (stm32Erase() == STM32ACK)
         stringtmp = "Erase OK";
       else if (stm32Erasen() == STM32ACK)
         stringtmp = "Erase OK";
       else
         stringtmp = "Erase failure";
+        
+      Serial.begin(115200);
       server.send(200, "text/plain", stringtmp);
     });
     
@@ -224,6 +233,9 @@ void setup(void)
       server.send(200, "text/plain", "Uploaded OK");
     });
     server.on("/FlashMode", HTTP_GET, []() {
+      
+      STM_Runmode = false;
+      Serial.begin(115200, SERIAL_8E1);
       
       FlashMode();     
       Serial.write(STM32INIT);
@@ -244,6 +256,8 @@ void setup(void)
       }
       else
         stringtmp = "ERROR";
+        
+        Serial.begin(115200);
         server.send(200, "text/plain",  "Init MCU :" + stringtmp);
     });
 
@@ -255,6 +269,11 @@ void setup(void)
 
 void loop(void) {
   server.handleClient();
+  delay(100);
+  if(STM_Runmode){
+    Serial.println("STM32-RUN");
+    delay(500);
+  }
 }
 
 
