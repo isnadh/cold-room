@@ -4,6 +4,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#define Uid "AABBCCDD"
+#define Version "1.0.0"
+
+////////////////////////////////////////////////////////////////////////////////
+
 char DEBUG_buff[100];
 char payload_buff[100];
 uint8_t sensor_id = 1;
@@ -11,14 +16,14 @@ String sensor_type = "Sensor_Temp";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const char* ssid     = "";
-const char* password = "";
-const char* mqtt_server = "broker.netpie.io";
+const char* ssid     = "Avilon";
+const char* password = "avilon11";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//have to change to uint32_t
-uint8_t GetData_timer = 0;
+uint32_t GetData_timer = 0;
+bool Need_register = false;
+bool Need_reconnect = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -39,6 +44,7 @@ void WIFI_Connect()
       delay(500);
     }
     else{
+      Need_reconnect = false;
       Serial1.println("\nWiFi connected");  
       Serial1.println("IP address: ");
       Serial1.println(WiFi.localIP());
@@ -81,14 +87,62 @@ bool HTTP_Post(void) {
     }  
     // Decode JSON/Extract values
     Serial1.println(F("Response:"));
-    //Serial.println(doc["status"].as<bool>());
+    Serial1.print(F("require: "));
+    Serial1.println(doc["require"].as<bool>());
+    Serial1.print(F("recieve: "));
     Serial1.println(doc["recieve"].as<char*>());
     http.end();
-    //return doc["status"].as<bool>();
+
+    if(doc["require"].as<bool>()){
+          Need_register = true;
+      }
+      
+    return true;
+  
+  }
+  else
+  {
+    
+    if(httpCode == -1){
+        Need_reconnect = true;
+    }
+    
+    Serial1.println("Error in response");
+    http.end();
+    return false;
+  }
+}
+
+bool HTTP_Put(void) {
+  
+  HTTPClient http; 
+
+  Serial1.println();
+  Serial1.println("http://203.151.152.59:1880/api/sensor/"+sensor_type+"/"+String(sensor_id)+"/"); 
+  Serial1.println("{\"uid\": \""+String(Uid)+"\",\"version\":\""+String(Version)+"\"}"); 
+
+  http.begin("http://203.151.152.59:1880/api/sensor/"+sensor_type+"/"+String(sensor_id)+"/"); 
+  http.addHeader("Content-Type", "application/json");
+  
+  int httpCode = http.PUT("{\"uid\": \""+String(Uid)+"\",\"version\":\""+String(Version)+"\"}");
+  String payload = http.getString();                                     
+  
+  Serial1.print(F("HTTP PUT Result: "));
+  Serial1.println(httpCode);   //Print HTTP return code
+  Serial1.println(payload);
+
+  if(httpCode == 201)
+  {
+    http.end();
     return true;
   }
   else
   {
+    
+    if(httpCode == -1){
+        Need_reconnect = true;
+    }
+    
     Serial1.println("Error in response");
     http.end();
     return false;
@@ -117,6 +171,8 @@ void serialFlush(){
 }   
 
 bool GetData(void){
+
+    Serial1.println();
 
     serialFlush();
     memset(payload_buff,0,100);
@@ -172,15 +228,13 @@ bool GetData(void){
 
   
 void setup() {
+  
   //Connect to STM
   Serial.begin(115200);
   //DEBUG
   Serial1.begin(115200);
-  
-  Serial1.println("CRC-16 bit test program");
-  Serial1.println("=======================");
-  
-  
+
+    
   WiFi.mode(WIFI_STA);  
   Serial1.println("WiFi connecting ......"); 
   if (WiFi.begin(ssid, password)) {
@@ -192,31 +246,82 @@ void setup() {
   Serial1.println("\nWiFi connected");  
   Serial1.println("IP address: ");
   Serial1.println(WiFi.localIP());
+
+
+  Serial1.println("Register with Gateway");
+  //Register with Gateway
+  while (true) {
+      if( HTTP_Put()){
+          Serial1.println("HTTP PUT Success");
+          break;
+        }
+      else{
+          Serial1.println("HTTP PUT Error");
+          Serial1.println("Retrying .......");
+          Serial.write("RegisGW\r\n");
+          delay(3000);
+        }
+  }
+  
   Serial1.println("Init OK");
+  
  
 }
 
 
 void loop() {
 
-  if (WiFi.status() != WL_CONNECTED){ 
+  if (WiFi.status() != WL_CONNECTED || Need_reconnect){ 
     Serial1.println("\nLoss connection!!!");
+    Serial.write("WiFierr\r\n");
     WIFI_Connect();
   }
 
+  else{
 
-   if ((millis() > GetData_timer + (5 * 1000)) || (millis() < GetData_timer )) {
-      GetData_timer = millis();
-      if (WiFi.status() == WL_CONNECTED){ 
-          if(GetData()){
-                if(HTTP_Post()){
-                    Serial1.println("DONE");
-                  } 
+        if(Need_register){
+            if( HTTP_Put()){
+                Serial1.println("HTTP PUT Success");
+                Need_register = false;
+              }
+            else{
+                Serial1.println("HTTP PUT Error");
+              }  
+        }
+      
+      
+        if ((millis() > GetData_timer + (5 * 1000)) || (millis() < GetData_timer )) {
+            GetData_timer = millis();
+            
+                for(uint8_t retry = 0 ; retry <= 5 ; retry++){
+
+                      if (Need_reconnect){ 
+                          Serial1.println("\nHTTP POST Error -> Loss connection!!!");
+                          Serial.write("WiFierr\r\n");
+                          break;
+                       }
+
+                      if(GetData()){
+                          Serial1.println("GetData Success");                                     
+                          if(HTTP_Post()){
+                              Serial1.println("HTTP POST Success");                       
+                            }
+                          else{
+                              Serial1.println("HTTP POST Error");
+                            }      
+                          break;                         
+                        }
+                      else{
+                          Serial1.println("GetData  Error ....");
+                          Serial1.print("retry: ");
+                          Serial1.println(retry);
+                          delay(1000);
+                        }
+                }
+                 
             }
-      }
+        }
+            
       
   }
   
-
-
-}
