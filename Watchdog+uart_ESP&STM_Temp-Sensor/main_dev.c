@@ -406,7 +406,7 @@ uint8_t Scan_Sensors(void)
 
   //Temp 3
   usart_puts("\n"); 
-  ds18b20_init(GPIOA, GPIO_Pin_4, TIM2);
+  ds18b20_init(GPIOB, GPIO_Pin_0, TIM2);
   for(retry = 0 ; retry <= 5 ; retry++){
 
       usart_puts("Scan Sensor 03 ");      
@@ -429,7 +429,7 @@ uint8_t Scan_Sensors(void)
 
   //Temp 4
   usart_puts("\n"); 
-  ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
+  ds18b20_init(GPIOB, GPIO_Pin_1, TIM2);
   for(retry = 0 ; retry <= 5 ; retry++){
 
       usart_puts("Scan Sensor 04 ");
@@ -496,7 +496,7 @@ void Read_Sensors(void){
 
    //Read Sensor3
    if (temp3_connected){
-      ds18b20_init(GPIOA, GPIO_Pin_4, TIM2);
+      ds18b20_init(GPIOB, GPIO_Pin_0, TIM2);
       ds18b20_convert_temperature_simple();
       Delay_1us(200000);
       temp_data = ds18b20_read_temperature_simple();
@@ -515,7 +515,7 @@ void Read_Sensors(void){
 
    //Read Sensor4
    if (temp4_connected){
-      ds18b20_init(GPIOA, GPIO_Pin_5, TIM2);
+      ds18b20_init(GPIOB, GPIO_Pin_1, TIM2);
       ds18b20_convert_temperature_simple();
       Delay_1us(200000);
       temp_data = ds18b20_read_temperature_simple();
@@ -633,7 +633,7 @@ int main(void)
   IWDG_ReloadCounter();
   Delay_1us(6000000);
 
-  memset(Command_BUF, 0, sizeof Command_BUF);
+  memset(Command_BUF, 0, sizeof(Command_BUF));
   atparser_flush(&parser);
   usart_puts("\r\nStart\r\n");
 
@@ -656,7 +656,7 @@ int main(void)
       if (!strcmp((char*)Command_BUF, "GetData\r\n")) {
         usart_puts("GET_DATA: OK\n");
 
-        memset(Command_BUF, 0, sizeof Command_BUF);
+        memset(Command_BUF, 0, sizeof(Command_BUF));
         atparser_flush(&parser);
         ///////////////////////////////////////////////////////
         Read_Sensors();
@@ -669,7 +669,7 @@ int main(void)
       else if (!strcmp((char*)Command_BUF, "WiFierr\r\n")) {
         usart_puts("WiFi_Error: OK\n");
 
-        memset(Command_BUF, 0, sizeof Command_BUF);
+        memset(Command_BUF, 0, sizeof(Command_BUF));
         atparser_flush(&parser);
         data_ready = false;
         count = 0;
@@ -678,7 +678,7 @@ int main(void)
       else if (!strcmp((char*)Command_BUF, "RegisGW\r\n")) {
         usart_puts("Regis_GW: OK\n");
 
-        memset(Command_BUF, 0, sizeof Command_BUF);
+        memset(Command_BUF, 0, sizeof(Command_BUF));
         atparser_flush(&parser);
         data_ready = false;
         count = 0;
@@ -686,7 +686,7 @@ int main(void)
 
       else{
         usart_puts("Unknown Command\n");        
-        memset(Command_BUF, 0, sizeof Command_BUF);
+        memset(Command_BUF, 0, sizeof(Command_BUF));
         atparser_flush(&parser);
         data_ready = false;
         count++;
@@ -713,7 +713,7 @@ int main(void)
    Delay_1us(6000000);
    usart_puts("\r\nStart\r\n");
 
-   memset(Command_BUF, 0, sizeof Command_BUF);
+   memset(Command_BUF, 0, sizeof(Command_BUF));
    atparser_flush(&parser);
 
    reset_cnt++;

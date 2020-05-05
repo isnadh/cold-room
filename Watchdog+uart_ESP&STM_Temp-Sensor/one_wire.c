@@ -57,6 +57,8 @@ void one_wire_init(GPIO_TypeDef *g, uint16_t p, TIM_TypeDef *t) {
 	/* Enable GPIO clock */
 	if (gpio == GPIOA)
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	else if (gpio == GPIOB)			
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	else
 		while(1){} // not implemented
 
@@ -81,7 +83,7 @@ void one_wire_init(GPIO_TypeDef *g, uint16_t p, TIM_TypeDef *t) {
 	TIM_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_InitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(timer, &TIM_InitStructure);
-//	TIM_ITConfig(timer, TIM_IT_Update, ENABLE);
+	// TIM_ITConfig(timer, TIM_IT_Update, ENABLE);
 	TIM_Cmd(timer, ENABLE);
 }
 
