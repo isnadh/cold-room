@@ -702,7 +702,7 @@ int main(void)
 
 
 
-   if(count >= 300){
+   if(count >= 600){
 
    IWDG_ReloadCounter();
 
