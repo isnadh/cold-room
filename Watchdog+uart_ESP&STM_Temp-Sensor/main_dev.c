@@ -16,6 +16,7 @@ void USART2_IRQHandler(void);
 void init_usart1(void);
 void init_usart2(void);
 void init_iwdg(void);
+void init_LED(void);
 void NVIC_Configuration(void);
 
 void send_byte(uint8_t b);
@@ -79,6 +80,12 @@ atparser_t parser;
       "temp_2": 24.4,
       "temp_3": "N/A",
       "temp_4": "N/A"
+    }
+"Connected_Sensors"{
+      "temp_1": 1,
+      "temp_2": 1,
+      "temp_3": 0,
+      "temp_4": 0
     }
 */
 
@@ -212,6 +219,18 @@ void usart_puts2(char *s)
     send_byte2(*s);
     s++;
   }
+}
+
+void init_LED(void){
+
+  GPIO_InitTypeDef GPIO_InitStructure;
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+  //Configure LED Pin
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Mode =  GPIO_Mode_Out_PP;
+  GPIO_InitStructure.GPIO_Pin =   GPIO_Pin_4 |GPIO_Pin_5 |GPIO_Pin_6 |GPIO_Pin_7;   
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
 }
 
 
@@ -366,6 +385,7 @@ uint8_t Scan_Sensors(void)
       usart_puts("Scan Sensor 01 ");      
       if(one_wire_reset_pulse()){
          usart_puts("-> Sensor01 connected!!!\n"); 
+         GPIO_SetBits(GPIOA,GPIO_Pin_4);
 
          data = one_wire_read_rom();
          sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
@@ -377,6 +397,7 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor01 not connected...\n");
+         GPIO_ResetBits(GPIOA,GPIO_Pin_4);
          strcpy(temp_1,"\"N/A\"");    
       }
   }
@@ -389,6 +410,7 @@ uint8_t Scan_Sensors(void)
       usart_puts("Scan Sensor 02 ");
       if(one_wire_reset_pulse()){
          usart_puts("-> Sensor02 connected!!!\n"); 
+         GPIO_SetBits(GPIOA,GPIO_Pin_5);
 
          data = one_wire_read_rom();
          sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
@@ -400,6 +422,7 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor02 not connected...\n");
+         GPIO_ResetBits(GPIOA,GPIO_Pin_5);
          strcpy(temp_2,"\"N/A\"");     
       }
   }
@@ -412,6 +435,7 @@ uint8_t Scan_Sensors(void)
       usart_puts("Scan Sensor 03 ");      
       if(one_wire_reset_pulse()){
          usart_puts("-> Sensor03 connected!!!\n"); 
+         GPIO_SetBits(GPIOA,GPIO_Pin_6);
 
          data = one_wire_read_rom();
          sprintf(Debug_BUF, "Address %d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
@@ -423,6 +447,7 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor03 not connected...\n");
+         GPIO_ResetBits(GPIOA,GPIO_Pin_6);
          strcpy(temp_3,"\"N/A\"");    
       }
   }
@@ -435,6 +460,7 @@ uint8_t Scan_Sensors(void)
       usart_puts("Scan Sensor 04 ");
       if(one_wire_reset_pulse()){
          usart_puts("-> Sensor04 connected!!!\n"); 
+         GPIO_SetBits(GPIOA,GPIO_Pin_7);
 
          data = one_wire_read_rom();
          sprintf(Debug_BUF, "%d:%d:%d:%d:%d:%d:%d:%d", data.address[7],data.address[6],data.address[5],data.address[4],data.address[3],data.address[2],data.address[1],data.address[0]);
@@ -446,6 +472,7 @@ uint8_t Scan_Sensors(void)
       }
       else{
          usart_puts("-> Sensor04 not connected...\n");
+         GPIO_ResetBits(GPIOA,GPIO_Pin_7);
          strcpy(temp_4,"\"N/A\"");     
       }
   }
@@ -536,9 +563,9 @@ void Read_Sensors(void){
 
 void Send_ESP_Payload(void)
 {
-  char Payload [100];
+  char Payload [200];
 
-  sprintf(Payload, "{\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}}", temp_1,temp_2,temp_3,temp_4 );
+  sprintf(Payload, "{\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s},\"Connected_Sensors\"{\"temp_1\": %d,\"temp_2\": %d,\"temp_3\": %d,\"temp_4\": %d}}", temp_1,temp_2,temp_3,temp_4,temp1_connected,temp2_connected,temp3_connected,temp4_connected);
   usart_puts(Payload);
   sprintf(Debug_BUF, "\nPayload size :  %d \n", strlen(Payload) );
   usart_puts(Debug_BUF);
@@ -607,6 +634,7 @@ int main(void)
   init_iwdg();
   init_usart1();
   init_usart2();
+  init_LED();
   NVIC_Configuration();
 
 
