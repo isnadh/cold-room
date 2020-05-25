@@ -736,15 +736,15 @@ void Send_ESP_Payload(void)
   switch (data_set_number)
   {
     case 1:
-        sprintf(Payload, "{\"Data\": {\"Va\": %s,\"Vb\": %s,\"Vc\": %s,\"Ia\": %s,\"Ib\": %s,\"Ic\": %s}}", Va,Vb,Vc,Ia,Ib,Ic );            
+        sprintf(Payload, "\"Data\": {\"Va\": %s,\"Vb\": %s,\"Vc\": %s,\"Ia\": %s,\"Ib\": %s,\"Ic\": %s}", Va,Vb,Vc,Ia,Ib,Ic );            
         break;
 
     case 2:
-        sprintf(Payload, "{\"Data\": {\"P\": %s,\"Pa\": %s,\"Pb\": %s,\"Pc\": %s,\"Q\": %s,\"Qa\": %s,\"Qb\": %s,\"Qc\": %s,\"S\": %s,\"Sa\": %s,\"Sb\": %s,\"Sc\": %s}}", P,Pa,Pb,Pc,Q,Qa,Qb,Qc,S,Sa,Sb,Sc );
+        sprintf(Payload, "\"Data\": {\"P\": %s,\"Pa\": %s,\"Pb\": %s,\"Pc\": %s,\"Q\": %s,\"Qa\": %s,\"Qb\": %s,\"Qc\": %s,\"S\": %s,\"Sa\": %s,\"Sb\": %s,\"Sc\": %s}", P,Pa,Pb,Pc,Q,Qa,Qb,Qc,S,Sa,Sb,Sc );
         break;
 
     case 3:
-        sprintf(Payload, "{\"Data\": {\"PF\": %s,\"PFa\": %s,\"PFb\": %s,\"PFc\": %s,\"Wh_positive\": %s,\"Wh_negative\": %s,\"Varh_positive\": %s,\"Varh_negative\": %s}}", PF,PFa,PFb,PFc,Wh_p,Wh_n,Varh_p,Varh_n );
+        sprintf(Payload, "\"Data\": {\"PF\": %s,\"PFa\": %s,\"PFb\": %s,\"PFc\": %s,\"Wh_positive\": %s,\"Wh_negative\": %s,\"Varh_positive\": %s,\"Varh_negative\": %s}", PF,PFa,PFb,PFc,Wh_p,Wh_n,Varh_p,Varh_n );
         break;
 
     default:              
