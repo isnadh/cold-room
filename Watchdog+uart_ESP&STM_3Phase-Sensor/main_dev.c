@@ -560,10 +560,10 @@ void Read_PQS(void){
     if(rs485_3P_read_Watt(&Int_P,&Int_Pa,&Int_Pb,&Int_Pc)){
       
       //Convert float to String//
-      gcvt((float)(Int_P/1000.0),5,P);
-      gcvt((float)(Int_Pa/1000.0),5,Pa);
-      gcvt((float)(Int_Pb/1000.0),5,Pb);
-      gcvt((float)(Int_Pc/1000.0),5,Pc);
+      gcvt((float)(Int_P),5,P);
+      gcvt((float)(Int_Pa),5,Pa);
+      gcvt((float)(Int_Pb),5,Pb);
+      gcvt((float)(Int_Pc),5,Pc);
 
       }
     else{
@@ -585,10 +585,10 @@ void Read_PQS(void){
     if(rs485_3P_read_Var(&Int_Q,&Int_Qa,&Int_Qb,&Int_Qc)){
       
       //Convert float to String//
-      gcvt((float)(Int_Q/1000.0),5,Q);
-      gcvt((float)(Int_Qa/1000.0),5,Qa);
-      gcvt((float)(Int_Qb/1000.0),5,Qb);
-      gcvt((float)(Int_Qc/1000.0),5,Qc);    
+      gcvt((float)(Int_Q),5,Q);
+      gcvt((float)(Int_Qa),5,Qa);
+      gcvt((float)(Int_Qb),5,Qb);
+      gcvt((float)(Int_Qc),5,Qc);    
 
       }
     else{
@@ -610,10 +610,10 @@ void Read_PQS(void){
     if(rs485_3P_read_VA(&Int_S,&Int_Sa,&Int_Sb,&Int_Sc)){
 
       //Convert float to String//
-      gcvt((float)(Int_S/1000.0),5,S);
-      gcvt((float)(Int_Sa/1000.0),5,Sa);
-      gcvt((float)(Int_Sb/1000.0),5,Sb);
-      gcvt((float)(Int_Sc/1000.0),5,Sc);   
+      gcvt((float)(Int_S),5,S);
+      gcvt((float)(Int_Sa),5,Sa);
+      gcvt((float)(Int_Sb),5,Sb);
+      gcvt((float)(Int_Sc),5,Sc);   
 
       }
     else{
@@ -659,10 +659,10 @@ void Read_Wh_Varh_PF(void){
     if(rs485_3P_readPF(&Int_PF,&Int_PFa,&Int_PFb,&Int_PFc)){
 
       //Convert float to String//
-      gcvt((float)(Int_PF/1000.0),5,PF);
-      gcvt((float)(Int_PFa/1000.0),5,PFa);
-      gcvt((float)(Int_PFb/1000.0),5,PFb);
-      gcvt((float)(Int_PFc/1000.0),5,PFc);    
+      gcvt((float)((int16_t)Int_PF/1000.0),5,PF);
+      gcvt((float)((int16_t)Int_PFa/1000.0),5,PFa);
+      gcvt((float)((int16_t)Int_PFb/1000.0),5,PFb);
+      gcvt((float)((int16_t)Int_PFc/1000.0),5,PFc);    
 
       }
     else{
@@ -684,8 +684,8 @@ void Read_Wh_Varh_PF(void){
     if(rs485_3P_readWh(&Int_Wh_p,&Int_Wh_n)){
     
       //Convert float to String//
-      gcvt((float)(Int_Wh_p/1.0),10,Wh_p);
-      gcvt((float)(Int_Wh_n/1.0),10,Wh_n); 
+      gcvt((float)((int32_t)Int_Wh_p/1.0),10,Wh_p);
+      gcvt((float)((int32_t)Int_Wh_n/1.0),10,Wh_n); 
 
       }
     else{
@@ -705,8 +705,8 @@ void Read_Wh_Varh_PF(void){
     if(rs485_3P_readVarh(&Int_Varh_p,&Int_Varh_n)){
 
       //Convert float to String//
-      gcvt((float)(Int_Varh_p/1.0),10,Varh_p);
-      gcvt((float)(Int_Varh_n/1.0),10,Varh_n); 
+      gcvt((float)((int32_t)Int_Varh_p/1.0),10,Varh_p);
+      gcvt((float)((int32_t)Int_Varh_n/1.0),10,Varh_n); 
    
 
       }
