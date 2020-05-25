@@ -87,12 +87,12 @@ bool HTTP_Post(void) {
 
   Serial1.println();
   Serial1.println("http://"+String(Gateway_ip)+"/api/uid/"+String(Uid)+"/"); 
-  Serial1.println(String(payload_buff)); 
+  Serial1.println("{"+String(payload_buff)+",\"properties\":{\"RSSI\" :" +WiFi.RSSI()+ "}}"); 
 
   http.begin("http://"+String(Gateway_ip)+"/api/uid/"+String(Uid)+"/"); 
   http.addHeader("Content-Type", "application/json");
   
-  int httpCode = http.POST(String(payload_buff));
+  int httpCode = http.POST("{"+String(payload_buff)+",\"properties\":{\"RSSI\" :" +WiFi.RSSI()+ "}}");
   String payload = http.getString();                                     
   
   Serial1.print(F("HTTP POST Result: "));
