@@ -565,8 +565,21 @@ void Send_ESP_Payload(void)
 {
   char Payload [200];
 
+  ////////////////////////////////////////////////////////////////////
+
+  /*HTTP Payload*/
+  
   sprintf(Payload, "\"Data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s},\"Connected_sensor\":{\"temp_1\": %d,\"temp_2\": %d,\"temp_3\": %d,\"temp_4\": %d}", temp_1,temp_2,temp_3,temp_4,temp1_connected,temp2_connected,temp3_connected,temp4_connected);
   usart_puts(Payload);
+  
+  /*MQTT Payload*/
+  
+  // sprintf(Payload, "\"data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}", temp_1,temp_2,temp_3,temp_4);
+  // usart_puts(Payload);
+  
+  ////////////////////////////////////////////////////////////////////
+
+
   sprintf(Debug_BUF, "\nPayload size :  %d \n", strlen(Payload) );
   usart_puts(Debug_BUF);
 
