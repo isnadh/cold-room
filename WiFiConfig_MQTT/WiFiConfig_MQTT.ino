@@ -250,7 +250,7 @@ void setup() {
   }
 
   //Connect to MQTT Broker
-  Serial1.println("nexpie connecting ......");
+  Serial1.println("\nnexpie connecting ......");
   client.setServer(mqtt_server, 1883);
   nexpie_connect();
   Serial1.println("nexpie connected");
