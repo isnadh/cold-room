@@ -574,7 +574,7 @@ void Send_ESP_Payload(void)
   
   /*MQTT Payload*/
   
-  // sprintf(Payload, "\"data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s}", temp_1,temp_2,temp_3,temp_4);
+  // sprintf(Payload, "\"data\": {\"temp_1\": %s,\"temp_2\": %s,\"temp_3\": %s,\"temp_4\": %s", temp_1,temp_2,temp_3,temp_4);
   // usart_puts(Payload);
   
   ////////////////////////////////////////////////////////////////////
