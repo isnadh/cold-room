@@ -32,7 +32,7 @@ const char* Secret = "uf!d~lXyuO8585vNi!iV#9Hc$6h4*mA9";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-char buffer[80];
+char buffer[300];
 char DEBUG_buff[200];
 char payload_buff[200];
 
@@ -316,8 +316,8 @@ void loop() {
               for(uint8_t retry = 0 ; retry <= 5 ; retry++){
 
                     if(GetData()){  
-                         Serial1.println("publish -->  " + String(payload_buff));
-                         sprintf(buffer, "%s",payload_buff);
+                         sprintf(buffer, "{%s,\"RSSI\": %d}}",payload_buff,WiFi.RSSI());
+                         Serial1.println("publish -->  " + String(buffer));
                          client.publish("@shadow/data/update",buffer);
                          digitalWrite(LED, LOW);
                          delay(500);             
