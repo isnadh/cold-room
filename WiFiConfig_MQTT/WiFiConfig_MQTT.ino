@@ -76,16 +76,16 @@ void nexpie_connect() {
   uint8_t reset_cnt = 0;
   // Loop until we're reconnected
   while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
+    Serial1.print("Attempting MQTT connection...");
     // Attempt to connect
     if (client.connect(Client_ID,Token,Secret)) {
       reset_cnt = 0;
-      Serial.println("Nexpie-Connected");
+      Serial1.println("Nexpie-Connected");
     } 
     else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      Serial1.print("failed, rc=");
+      Serial1.print(client.state());
+      Serial1.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
       reset_cnt++;
@@ -343,7 +343,7 @@ void loop() {
         }
         delay(100);    
     }
-    
+  delay(100);   
  }
           
 
