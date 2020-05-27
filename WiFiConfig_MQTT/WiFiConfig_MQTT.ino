@@ -16,9 +16,9 @@ PubSubClient client(espClient);
 ////////////////////////////////////////////////////////////////////////////////
 
 const char* mqtt_server = "broker.nexpie.io";
-const char* Client_ID  = "a925d075-3c1a-4337-9ead-89fb7cd18889";
-const char* Token   = "9LKJpGuMcKAiqor7nf6Xqo1DaRBVVFRK";
-const char* Secret = "oS$8jeol~4)1jlyLTdm~ZdCuL5b#qiC)";
+const char* Client_ID  = "";
+const char* Token   = "";
+const char* Secret = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,7 +27,7 @@ const char* Secret = "oS$8jeol~4)1jlyLTdm~ZdCuL5b#qiC)";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define Uid "SENSOR3P-V2"
+#define Uid ""
 #define Version "1.0.0"
 
 ////////////////////////////////////////////////////////////////////////////////
