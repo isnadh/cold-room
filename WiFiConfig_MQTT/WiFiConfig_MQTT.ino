@@ -32,7 +32,7 @@ const char* Secret = "oS$8jeol~4)1jlyLTdm~ZdCuL5b#qiC)";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-char buffer[300];
+char MQTT_buffer[300];
 char DEBUG_buff[200];
 char payload_buff[200];
 
@@ -309,16 +309,17 @@ void loop() {
             /* Call this method regularly otherwise the connection may be lost */
             client.loop();
             
-            if ((millis() > GetData_timer + (7 * 1000)) || (millis() < GetData_timer )) {
+            if ((millis() > GetData_timer + (8 * 1000)) || (millis() < GetData_timer )) {
               
               GetData_timer = millis();
 
               for(uint8_t retry = 0 ; retry <= 5 ; retry++){
 
                     if(GetData()){  
-                         sprintf(buffer, "{%s,\"RSSI\": %d}}",payload_buff,WiFi.RSSI());
-                         Serial1.println("publish -->  " + String(buffer));
-                         client.publish("@shadow/data/update",buffer);
+                         sprintf(MQTT_buffer, "{%s,\"RSSI\": %d}}",payload_buff,WiFi.RSSI());
+                         Serial1.println("publish -->  " + String(MQTT_buffer));
+                         client.publish("@shadow/data/update",MQTT_buffer);
+                         memset(MQTT_buffer, 0, sizeof(MQTT_buffer)); 
                          digitalWrite(LED, LOW);
                          delay(500);             
                          digitalWrite(LED, HIGH);
