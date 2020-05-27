@@ -732,7 +732,10 @@ void Read_Wh_Varh_PF(void){
 void Send_ESP_Payload(void)
 {
   char Payload [200];
+  
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  /*HTTP Payload*/
   switch (data_set_number)
   {
     case 1:
@@ -750,6 +753,28 @@ void Send_ESP_Payload(void)
     default:              
         return;
   }
+
+  /*MQTT Payload*/
+  // switch (data_set_number)
+  // {
+  //   case 1:
+  //       sprintf(Payload, "\"data\": {\"Va\": %s,\"Vb\": %s,\"Vc\": %s,\"Ia\": %s,\"Ib\": %s,\"Ic\": %s", Va,Vb,Vc,Ia,Ib,Ic );            
+  //       break;
+
+  //   case 2:
+  //       sprintf(Payload, "\"data\": {\"P\": %s,\"Pa\": %s,\"Pb\": %s,\"Pc\": %s,\"Q\": %s,\"Qa\": %s,\"Qb\": %s,\"Qc\": %s,\"S\": %s,\"Sa\": %s,\"Sb\": %s,\"Sc\": %s", P,Pa,Pb,Pc,Q,Qa,Qb,Qc,S,Sa,Sb,Sc );
+  //       break;
+
+  //   case 3:
+  //       sprintf(Payload, "\"data\": {\"PF\": %s,\"PFa\": %s,\"PFb\": %s,\"PFc\": %s,\"Wh_positive\": %s,\"Wh_negative\": %s,\"Varh_positive\": %s,\"Varh_negative\": %s", PF,PFa,PFb,PFc,Wh_p,Wh_n,Varh_p,Varh_n );
+  //       break;
+
+  //   default:              
+  //       return;
+  // }
+
+
+   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // sprintf(Debug_BUF, "\nPayload size :  %d \n", strlen(Payload) );
   // usart_puts2(Debug_BUF);
