@@ -16,9 +16,9 @@ PubSubClient client(espClient);
 ////////////////////////////////////////////////////////////////////////////////
 
 const char* mqtt_server = "broker.nexpie.io";
-const char* Client_ID  = "6cc2c93b-5433-42bd-943b-5130a501daa6";
-const char* Token   = "wUnzRLDV4VvfyPaHdhUHGn84os5uEpXt";
-const char* Secret = "uf!d~lXyuO8585vNi!iV#9Hc$6h4*mA9";
+const char* Client_ID  = "a925d075-3c1a-4337-9ead-89fb7cd18889";
+const char* Token   = "9LKJpGuMcKAiqor7nf6Xqo1DaRBVVFRK";
+const char* Secret = "oS$8jeol~4)1jlyLTdm~ZdCuL5b#qiC)";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,7 +27,7 @@ const char* Secret = "uf!d~lXyuO8585vNi!iV#9Hc$6h4*mA9";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define Uid "SENSORTEMP-WIFI"
+#define Uid "SENSOR3P-V2"
 #define Version "1.0.0"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ void loop() {
             /* Call this method regularly otherwise the connection may be lost */
             client.loop();
             
-            if ((millis() > GetData_timer + (8 * 1000)) || (millis() < GetData_timer )) {
+            if ((millis() > GetData_timer + (7 * 1000)) || (millis() < GetData_timer )) {
               
               GetData_timer = millis();
 
