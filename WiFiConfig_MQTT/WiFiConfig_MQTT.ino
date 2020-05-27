@@ -319,7 +319,6 @@ void loop() {
                          sprintf(MQTT_buffer, "{%s,\"RSSI\": %d}}",payload_buff,WiFi.RSSI());
                          Serial1.println("publish -->  " + String(MQTT_buffer));
                          client.publish("@shadow/data/update",MQTT_buffer);
-                         memset(MQTT_buffer, 0, sizeof(MQTT_buffer)); 
                          digitalWrite(LED, LOW);
                          delay(500);             
                          digitalWrite(LED, HIGH);
