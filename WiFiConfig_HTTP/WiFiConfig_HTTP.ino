@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #define Uid "SENSOR3P-V2"
+#define Sensor_type "3Phase"
 #define Version "1.0.0"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,12 +148,12 @@ bool HTTP_Put(void) {
 
   Serial1.println();
   Serial1.println("http://"+String(Gateway_ip)+"/api/uid/"+String(Uid)+"/"); 
-  Serial1.println("{\"uid\": \""+String(Uid)+"\",\"version\":\""+String(Version)+"\"}"); 
+  Serial1.println("{\"uid\": \""+String(Uid)+"\",\"type\":\""+String(Sensor_type)+"\",\"version\":\""+String(Version)+"\"}"); 
 
   http.begin("http://"+String(Gateway_ip)+"/api/uid/"+String(Uid)+"/"); 
   http.addHeader("Content-Type", "application/json");
   
-  int httpCode = http.PUT("{\"uid\": \""+String(Uid)+"\",\"version\":\""+String(Version)+"\"}");
+  int httpCode = http.PUT("{\"uid\": \""+String(Uid)+"\",\"type\":\""+String(Sensor_type)+"\",\"version\":\""+String(Version)+"\"}");
   String payload = http.getString();                                     
   
   Serial1.print(F("HTTP PUT Result: "));
